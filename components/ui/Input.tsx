@@ -1,13 +1,10 @@
 import React from 'react';
 
-interface InputProps {
-  type?: string;
+interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'className'> {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  placeholder?: string;
   label?: string;
   error?: string;
-  required?: boolean;
   className?: string;
 }
 
@@ -20,6 +17,7 @@ export default function Input({
   error,
   required = false,
   className = '',
+  ...rest
 }: InputProps) {
   return (
     <div className="w-full">
@@ -47,6 +45,7 @@ export default function Input({
           outline-none
           ${className}
         `}
+        {...rest}
       />
       {error && (
         <p className="mt-1 text-sm text-red-500">{error}</p>
