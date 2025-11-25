@@ -33,7 +33,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <h1 className="text-3xl font-semibold text-zinc-900 dark:text-zinc-50">
-            반갑습니다. demo 입니다. admin@google.com / admin12312 로그인하세요.
+              Admin Social Media Dashboard
           </h1>
           <p className="mt-2 text-zinc-600 dark:text-zinc-400">
             Sign in to access the dashboard
