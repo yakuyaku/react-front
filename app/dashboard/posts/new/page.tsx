@@ -4,8 +4,10 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { PostCreateRequest } from '@/types/post';
+import { FileUploadResponse } from '@/types/file';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
+import FileUpload from '@/components/files/FileUpload';
 import Link from 'next/link';
 
 export default function NewPostPage() {
@@ -13,11 +15,20 @@ export default function NewPostPage() {
   const { token, user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [uploadedFiles, setUploadedFiles] = useState<FileUploadResponse[]>([]);
   const [formData, setFormData] = useState<PostCreateRequest>({
     title: '',
     content: '',
     is_pinned: false,
   });
+
+  const handleFileUploadSuccess = (files: FileUploadResponse[]) => {
+    setUploadedFiles((prev) => [...prev, ...files]);
+  };
+
+  const handleFileUploadError = (errorMsg: string) => {
+    setError(errorMsg);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +47,7 @@ export default function NewPostPage() {
     setError('');
 
     try {
+      // Step 1: Create the post
       const response = await fetch('/api/posts', {
         method: 'POST',
         headers: {
@@ -51,7 +63,27 @@ export default function NewPostPage() {
       }
 
       const data = await response.json();
-      router.push(`/dashboard/posts/${data.id}`);
+      const postId = data.id;
+
+      // Step 2: Attach files if any
+      if (uploadedFiles.length > 0) {
+        const fileIds = uploadedFiles.map(f => f.id);
+
+        const attachResponse = await fetch(`/api/files/posts/${postId}/attach`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({ file_ids: fileIds }),
+        });
+
+        if (!attachResponse.ok) {
+          console.error('Failed to attach files, but post was created');
+        }
+      }
+
+      router.push(`/dashboard/posts/${postId}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create post');
       console.error('Error creating post:', err);
@@ -117,6 +149,23 @@ export default function NewPostPage() {
             />
             <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
               Write detailed content for your post
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+              Attachments
+            </label>
+            <FileUpload
+              onUploadSuccess={handleFileUploadSuccess}
+              onUploadError={handleFileUploadError}
+              multiple={true}
+              isPublic={true}
+              isTemp={true}
+              maxSizeMB={50}
+            />
+            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+              Upload images, documents, or other files (max 10 files, 50MB each)
             </p>
           </div>
 

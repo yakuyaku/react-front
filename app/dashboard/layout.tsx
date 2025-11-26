@@ -70,6 +70,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 >
                   Posts
                 </Link>
+                <Link
+                  href="/dashboard/comments"
+                  className={`text-sm font-medium transition-colors ${
+                    isActive('/dashboard/comments')
+                      ? 'text-zinc-900 dark:text-zinc-50'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50'
+                  }`}
+                >
+                  Comments
+                </Link>
               </nav>
             </div>
 

@@ -7,6 +7,8 @@ import { Post } from '@/types/post';
 import Button from '@/components/ui/Button';
 import Loading from '@/components/ui/Loading';
 import Link from 'next/link';
+import CommentList from '@/components/comments/CommentList';
+import AttachmentList from '@/components/files/AttachmentList';
 
 export default function PostDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -188,6 +190,18 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
           </div>
         )}
       </div>
+
+      {/* Attachments Section */}
+      <div className="bg-white dark:bg-zinc-900 rounded-lg shadow p-6">
+        <AttachmentList postId={post.id} />
+      </div>
+
+      {/* Comments Section */}
+      <CommentList
+        postId={post.id}
+        currentUserId={user?.id}
+        isAdmin={user?.is_admin || false}
+      />
     </div>
   );
 }
